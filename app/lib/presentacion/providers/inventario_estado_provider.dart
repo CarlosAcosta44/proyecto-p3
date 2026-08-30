@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../dominio/entidades/item.dart';
 import 'proveedores.dart';
 import '../../dominio/servicios/sincronizacion_servicio.dart';
+import '../../datos/repositorios/inventario_repositorio.dart';
 
 class InventarioEstado {
   final List<Item> items;
@@ -10,7 +12,11 @@ class InventarioEstado {
 
   InventarioEstado({this.items = const [], this.cargando = true, this.error});
 
-  InventarioEstado copiarCon({List<Item>? items, bool? cargando, String? error}) {
+  InventarioEstado copiarCon({
+    List<Item>? items,
+    bool? cargando,
+    String? error,
+  }) {
     return InventarioEstado(
       items: items ?? this.items,
       cargando: cargando ?? this.cargando,
@@ -23,7 +29,15 @@ class InventarioNotifier extends StateNotifier<InventarioEstado> {
   final Ref ref;
 
   InventarioNotifier(this.ref) : super(InventarioEstado()) {
-    cargarInventario();
+    ref.listen<InventarioRepositorio?>(
+      inventarioRepoProvider,
+      (previous, next) {
+        if (next != null) {
+          cargarInventario();
+        }
+      },
+      fireImmediately: true,
+    );
   }
 
   Future<void> cargarInventario() async {
@@ -43,32 +57,44 @@ class InventarioNotifier extends StateNotifier<InventarioEstado> {
     try {
       final servicio = ref.read(syncServicioProvider);
       if (servicio == null) {
-        state = state.copiarCon(cargando: false, error: 'Servicio no disponible');
+        state = state.copiarCon(
+          cargando: false,
+          error: 'Servicio no disponible',
+        );
         return false;
       }
       await servicio.sincronizar();
       await cargarInventario();
       return true;
     } on ConflictosException catch (e) {
-      state = state.copiarCon(cargando: false, error: 'CONFLICTO');
-      throw e;
+      rethrow;
     } catch (e) {
       state = state.copiarCon(cargando: false, error: e.toString());
       return false;
     }
   }
 
-  Future<void> registrarConteo(String codigo, int cantidad, {String? fotoRuta, String? estado}) async {
+  Future<void> registrarConteo(
+    String codigo,
+    int cantidad, {
+    String? fotoRuta,
+    String? estado,
+  }) async {
     try {
       final repo = ref.read(inventarioRepoProvider);
       if (repo == null) return;
-      await repo.registrarConteo(codigo, cantidad, fotoRuta: fotoRuta, estado: estado);
+      await repo.registrarConteo(
+        codigo,
+        cantidad,
+        fotoRuta: fotoRuta,
+        estado: estado,
+      );
       await cargarInventario();
     } catch (e) {
       state = state.copiarCon(error: e.toString());
     }
   }
-  
+
   Future<void> resolverConflicto(Item ganador) async {
     try {
       final repo = ref.read(inventarioRepoProvider);
@@ -81,6 +107,7 @@ class InventarioNotifier extends StateNotifier<InventarioEstado> {
   }
 }
 
-final inventarioProvider = StateNotifierProvider<InventarioNotifier, InventarioEstado>((ref) {
-  return InventarioNotifier(ref);
-});
+final inventarioProvider =
+    StateNotifierProvider<InventarioNotifier, InventarioEstado>((ref) {
+      return InventarioNotifier(ref);
+    });

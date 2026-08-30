@@ -32,11 +32,18 @@ class InicioPagina extends ConsumerWidget {
             tooltip: 'Sincronizar',
             onPressed: estado.cargando ? null : () async {
               try {
-                await ref.read(inventarioProvider.notifier).sincronizar();
+                final exito = await ref.read(inventarioProvider.notifier).sincronizar();
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Sincronización exitosa')),
-                  );
+                  if (exito) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Sincronización exitosa')),
+                    );
+                  } else {
+                    final error = ref.read(inventarioProvider).error;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error al sincronizar: $error'), backgroundColor: Colors.red),
+                    );
+                  }
                 }
               } on ConflictosException catch(e) {
                 if (context.mounted) {

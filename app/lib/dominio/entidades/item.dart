@@ -29,9 +29,9 @@ class Item {
       cantidad: mapa['cantidad'] as int,
       estado: mapa['estado'] as String,
       version: mapa['version'] as int,
-      sucio: mapa['sucio'] as int,
+      sucio: (mapa['sucio'] ?? 0) as int,
       fotoRuta: mapa['foto_ruta'] as String?,
-      modificadoEn: mapa['modificado_en'] as String?,
+      modificadoEn: (mapa['modificado_en'] ?? mapa['modificadoEn']) as String?,
     );
   }
 

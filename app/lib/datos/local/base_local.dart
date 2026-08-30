@@ -1,7 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import '../dominio/entidades/item.dart';
-
 Future<Database> openLocalDatabase() async {
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'inventario.db');
