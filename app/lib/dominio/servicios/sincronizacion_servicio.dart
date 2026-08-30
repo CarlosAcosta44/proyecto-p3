@@ -29,8 +29,8 @@ class SincronizacionServicio {
     };
 
     try {
-      // Ajustar URL según el entorno (para dispositivo físico usaremos adb reverse con localhost)
-      final respuesta = await dio.post('http://192.168.11.10:3000/api/sync', data: payload);
+      // Ajustar URL según el entorno
+      final respuesta = await dio.post('https://proyecto-p3-pqrc.onrender.com/api/sync', data: payload);
       final data = respuesta.data;
       
       final aplicados = List<String>.from(data['aplicados'] ?? []);
