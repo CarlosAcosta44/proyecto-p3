@@ -22,3 +22,16 @@ cd app
 flutter pub get
 flutter run
 ```
+
+## Códigos de Prueba
+
+Escanea los siguientes códigos de barras para realizar las pruebas de escaneo en la aplicación:
+
+### Monitor Dell 24"
+![1234567890123](docs/barcode_1.png)
+
+### Teclado Mecánico Logitech
+![9876543210987](docs/barcode_2.png)
+
+### Portátil ThinkPad T14
+![1122334455667](docs/barcode_3.png)

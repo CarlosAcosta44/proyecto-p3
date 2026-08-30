@@ -8,7 +8,8 @@ const codes = [
   { code: '1122334455667', name: 'Portátil ThinkPad T14' }
 ];
 
-const outputDir = '/home/kairos/.gemini/antigravity-ide/brain/6c04885e-bc0c-470f-8fe4-d0459a07bf77';
+const outputDir = path.join(__dirname, '..', 'docs');
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
 codes.forEach((item, index) => {
   bwipjs.toBuffer({
@@ -18,6 +19,7 @@ codes.forEach((item, index) => {
     height: 10,
     includetext: true,
     textxalign: 'center',
+    backgroundcolor: 'FFFFFF'
   }, function (err, png) {
     if (err) {
       console.error(err);
